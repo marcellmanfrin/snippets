@@ -1,0 +1,165 @@
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>5.
+
+[project]
+name = "snippet-typehints"
+dynamic = ["version"]
+requires-python = ">= 3.11"
+
+[tool.poetry]
+name = "snippet-typehints"
+version = "0.1.0"
+description = "Snippets about python type hints"
+authors = ["Marcell Manfrin <barbacena@gmail.com>"]
+readme = "README.md"
+license = "LGPL-3.0-or-later"
+packages = [{include = "snippet", from = "src"}]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]  
+pytest = "^7.4"  
+pytest-sugar = "*"  
+pytest-cov = "*"  
+black = "*"  
+mypy = "*"  
+ruff = "*"  
+isort = "*"  
+tox = "^4.11.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+select = [
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "UP",  # pyupgrade,
+  "I",   # isort,
+  "B",   # Bugbear
+]
+unfixable = ["B"]
+src = ["src"]
+
+[tool.ruff.lint]
+unfixable = [
+    "ERA", # do not autoremove commented out code
+]
+extend-select = [
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "ERA", # flake8-eradicate/eradicate
+    "I",   # isort
+    "N",   # pep8-naming
+    "PIE", # flake8-pie
+    "PGH", # pygrep
+    "RUF", # ruff checks
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "UP",  # pyupgrade
+]
+ignore = [
+    "ERA001", # comentarios de codigo
+    # "B904", # use 'raise ... from err'
+    # "B905", # use explicit 'strict=' parameter with 'zip()'
+    # "N818", #  Exception name should be named with an Error suffix
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+force-single-line = true
+lines-between-types = 1
+lines-after-imports = 2
+
+[tool.black]
+target-version = ['py310']
+preview = true
+extend-exclude = "tests/([^/]*/)*fixtures/"
+
+[tool.mypy]
+files = "src, tests"
+mypy_path = "src"
+namespace_packages = true
+explicit_package_bases = true
+show_error_codes = true
+strict = true
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
+exclude = [
+    "tests/fixtures",
+    "tests/masonry/builders/fixtures",
+    "tests/utils/fixtures",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:"
+]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+requires =
+    tox>=4
+env_list = 
+    py{311,312}
+    lint
+    type
+    coverage
+
+[testenv]
+description = run the tests with pytest
+skip_install = true
+allowlist_externals = poetry
+commands_pre =
+    poetry install
+commands = 
+    poetry run pytest {posargs:tests}
+
+[testenv:type]
+description = run type checks
+skip_install = true
+allowlist_externals = poetry
+commands_pre =
+    poetry install
+commands =
+    poetry run mypy {posargs:src tests}
+
+[testenv:lint]
+description = run linter
+skip_install = true
+allowlist_externals = poetry
+commands_pre =
+    poetry install
+commands = poetry run ruff {posargs:src tests}
+
+[testenv:coverage]
+description = run coverage report
+skip_install = true
+allowlist_externals = poetry
+commands_pre =
+    poetry install
+commands = poetry run pytest --cov=src tests/
+"""
