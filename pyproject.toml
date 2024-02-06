@@ -18,7 +18,7 @@ requires-python = ">= 3.11"
 
 [tool.poetry]
 name = "snippet-typehints"
-version = "0.1.0"
+version = "1.0.0"
 description = "Snippets about python type hints"
 authors = ["Marcell Manfrin <barbacena@gmail.com>"]
 readme = "README.md"
